@@ -23,13 +23,16 @@ const FaceComponent = () => {
 
     //! Handle Register : Enroll (Register) New User
     const handleRegister = async () => {
+        console.log({ fullName, email });
         try {
-            const response = await faceioRef.current?.enroll({
-                locale: 'auto',
-                payload: { user_id: GenerateRandomId(), full_name: fullName, email: email },
-            });
-            console.log('User enrolled successfully:', response);
-            toaster.success({ text: 'User enrolled successfully!' });
+            if (fullName !== '' && email !== '') {
+                const response = await faceioRef.current?.enroll({
+                    locale: 'auto',
+                    payload: { user_id: GenerateRandomId(), full_name: fullName, email: email },
+                });
+                console.log('User enrolled successfully:', response);
+                toaster.success({ text: 'User enrolled successfully!' });
+            }
         } catch (error) {
             console.log('User enrolled failed ::: ', error);
             handleError(error);
@@ -127,31 +130,32 @@ const FaceComponent = () => {
     }, []);
 
     return (
-        <div className='App'>
-            <h1>FaceIO Authentication</h1>
+        <>
+            <div className="app-container">
+                <div className="background-section">
+                    <h1 className="headline">GET READY!</h1>
+                    <h2 className="sub-headline">YOUR ADVENTURE IS HERE</h2>
+                    <button className="begin-btn">BEGIN</button>
+                </div>
 
-            {!isLoggedIn ? (
-                <>
-                    <form onSubmit={(e) => { e.preventDefault(); handleRegister(); }}>
-                        <div>
-                            <label>Email:</label>
-                            <input type='email' value={email} onChange={(e) => setEmail(e.target.value)} required />
-                        </div>
+                {!isLoggedIn && <div className="login-card">
+                    <div className="logo-container">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQKI0UsN0rAyBgbP5pQHGb50naj97JUk6h1Xg&s" alt="Logo" className="logo" />
+                    </div>
+                    <form className="login-form">
+                        <input type="fullName" value={fullName} onChange={(e) => setFullName(e.target.value)} required className="input-field" placeholder="fullName" />
+                        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="input-field" placeholder="Email" />
 
-                        <div>
-                            <label>Full Name:</label>
-                            <input type='text' value={fullName} onChange={(e) => setFullName(e.target.value)} required />
-                        </div>
-
-                        <button type='submit'>Enroll New User</button>
+                        <div onClick={() => handleRegister()} className="login-btn">Enroll</div>
                     </form>
+                    <div className="create-account">
+                        <p>Already have a account? <span onClick={() => handleLogin()} className="create-link">Login</span></p>
+                    </div>
+                </div>}
 
-                    <button onClick={handleLogin}>Authenticate User</button>
-                </>
-            ) : (
-                <p>Welcome, you are authenticated!</p>
-            )}
-        </div>
+                {isLoggedIn && <div onClick={() => setIsLoggedIn(false)} style={{ position: 'fixed', top: '20px', right: '20px' }} className="login-btn">Logout</div>}
+            </div>
+        </>
     );
 };
 
