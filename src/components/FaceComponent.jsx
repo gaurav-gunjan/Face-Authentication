@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import faceIO from '@faceio/fiojs';
 import { GenerateRandomId } from '../utils/common-function';
 import { toaster } from '../services/toast-service';
 
 const FaceComponent = () => {
-    const [fioInstance, setFioInstance] = useState(null);
     const faceioRef = useRef(null);
 
     const [email, setEmail] = useState('');
@@ -12,23 +11,12 @@ const FaceComponent = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     // Todo : Initialize Face IO
-    // const initialiseFaceio = async () => {
-    //     try {
-    //         const faceio = new faceIO('fioa52f3');
-    //         setFioInstance(faceio);
-    //         console.log('FaceIO initialized successfully ::: ', faceio);
-    //     } catch (error) {
-    //         console.log('FaceIO initialization failed ::: ', error);
-    //         handleError(error);
-    //         fioInstance.restartSession();
-    //     }
-    // };
     const initialiseFaceio = async () => {
         try {
-            faceioRef.current = new faceIO(publicKey);
-            console.log("FaceIO initialized successfully");
+            faceioRef.current = new faceIO('fioa52f3');
+            console.log('FaceIO initialized successfully ::: ', faceioRef.current);
         } catch (error) {
-            console.log(error);
+            console.log('FaceIO initialization failed ::: ', error);
             handleError(error);
         }
     };
@@ -36,7 +24,7 @@ const FaceComponent = () => {
     //! Handle Register : Enroll (Register) New User
     const handleRegister = async () => {
         try {
-            const response = await fioInstance?.enroll({
+            const response = await faceioRef.current?.enroll({
                 locale: 'auto',
                 payload: { user_id: GenerateRandomId(), full_name: fullName, email: email },
             });
@@ -45,26 +33,27 @@ const FaceComponent = () => {
         } catch (error) {
             console.log('User enrolled failed ::: ', error);
             handleError(error);
-            fioInstance.restartSession();
+            faceioRef.current?.restartSession();
         }
     };
 
     //! Handle Login : Authenticate User
     const handleLogin = async () => {
         try {
-            const response = await fioInstance?.authenticate();
+            const response = await faceioRef.current?.authenticate();
             console.log('User authenticated successfully ::: ', response);
             setIsLoggedIn(true);
             toaster.success({ text: `Hii, ${response?.payload?.full_name}! You are Successfully logged in!` });
         } catch (error) {
             console.log('User authenticated failed ::: ', error);
             handleError(error);
+            faceioRef.current?.restartSession();
         }
     };
 
     // Todo : Handle Errors
     const handleError = (errCode) => {
-        const fioErrs = fioInstance?.fetchAllErrorCodes();
+        const fioErrs = faceioRef.current?.fetchAllErrorCodes();
         console.log('Fio Error ::: ', fioErrs);
         console.log('Error Code ::: ', errCode);
 
