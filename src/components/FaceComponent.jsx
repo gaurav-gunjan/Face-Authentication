@@ -28,6 +28,7 @@ const FaceComponent = () => {
         try {
             if (fullName !== '' && email !== '') {
                 const response = await faceioRef.current?.enroll({
+                    userConsent: false,
                     locale: 'auto',
                     payload: { user_id: GenerateRandomId(), full_name: fullName, email: email },
                 });
