@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
 import faceIO from '@faceio/fiojs';
-import { GenerateRandomId } from '../utils/common-function';
+import React, { useState, useEffect, useRef } from 'react';
 import { toaster } from '../services/toast-service';
+import { face_io_public_id } from '../utils/constant';
+import { GenerateRandomId } from '../utils/common-function';
 
 const FaceComponent = () => {
     const faceioRef = useRef(null);
@@ -13,7 +14,7 @@ const FaceComponent = () => {
     // Todo : Initialize Face IO
     const initialiseFaceio = async () => {
         try {
-            faceioRef.current = new faceIO('fioa52f3');
+            faceioRef.current = new faceIO(face_io_public_id);
             console.log('FaceIO initialized successfully ::: ', faceioRef.current);
         } catch (error) {
             console.log('FaceIO initialization failed ::: ', error);
@@ -77,7 +78,7 @@ const FaceComponent = () => {
                 toaster.info({ text: 'Minors are not allowed to enroll on this application!' });
                 break;
             case fioErrs.PAD_ATTACK:
-                toaster.info('Presentation (Spoof) Attack (PAD) detected during the scan process');
+                toaster.info({ text: 'Presentation (Spoof) Attack (PAD) detected during the scan process' });
                 break;
             case fioErrs.FACE_MISMATCH:
                 toaster.info({ text: 'Calculated Facial Vectors of the user being enrolled do not matches' });
